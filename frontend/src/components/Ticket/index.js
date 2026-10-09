@@ -28,7 +28,8 @@ const useStyles = makeStyles(theme => ({
     display: "flex",
     height: "100%",
     position: "relative",
-    overflow: "hidden"
+    overflow: "hidden",
+    backgroundColor: "#ffffff" // Fundo branco para integrar com o card principal
   },
 
   mainWrapper: {
@@ -37,24 +38,10 @@ const useStyles = makeStyles(theme => ({
     display: "flex",
     flexDirection: "column",
     overflow: "hidden",
-    borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0,
-    borderLeft: "0",
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    })
+    backgroundColor: "#ffffff",
+    zIndex: 1 // Garante que fique acima do shade
   },
 
-  mainWrapperShift: {
-    borderTopRightRadius: 0,
-    borderBottomRightRadius: 0,
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen
-    }),
-    marginRight: 0
-  },
   drawerShade: {
     display: "none",
     [theme.breakpoints.down(1400)]: {
@@ -64,9 +51,21 @@ const useStyles = makeStyles(theme => ({
       right: 0,
       bottom: 0,
       left: 0,
-      backdropFilter: "blur(2px)",
-      zIndex: 100
+      backdropFilter: "blur(4px)", // Desfoque mais moderno
+      backgroundColor: "rgba(0, 0, 0, 0.05)", // Leve camada escura
+      zIndex: 100,
+      transition: "opacity 0.3s ease"
     }
+  },
+
+  // NOVO: Estilo moderno para a área de Tags
+  tagsWrapper: {
+    padding: theme.spacing(1, 2),
+    backgroundColor: "#f8fafc",
+    borderBottom: "1px solid #e2e8f0",
+    display: "flex",
+    alignItems: "center",
+    minHeight: "48px"
   }
 }));
 
@@ -207,32 +206,37 @@ const Ticket = () => {
   return (
     <div className={classes.root} id="drawer-container">
       <Paper
-        variant="outlined"
         elevation={0}
-        className={clsx(classes.mainWrapper, {
-          [classes.mainWrapperShift]: drawerOpen
-        })}
+        className={classes.mainWrapper}
       >
+        {/* Efeito de desfoque moderno */}
         <div
           className={clsx({
             [classes.drawerShade]: drawerOpen
           })}
           onClick={() => setDrawerOpen(false)}
         ></div>
+
+        {/* Cabeçalho */}
         <TicketHeader loading={loading}>
           {renderTicketInfo()}
           <TicketActionButtons ticket={ticket} showTabGroups={showTabGroups} />
         </TicketHeader>
-        <Paper>
+
+        {/* Área de Tags Modernizada */}
+        <div className={classes.tagsWrapper}>
           <TagsContainer
             ticket={["ticket", "both"].includes(tagsMode) && ticket}
             contact={tagsMode === "contact" && contact}
           />
-        </Paper>
+        </div>
+
+        {/* Área de Mensagens e Input */}
         <ReplyMessageProvider>
           <EditMessageProvider>{renderMessagesList()}</EditMessageProvider>
         </ReplyMessageProvider>
       </Paper>
+
       <ContactDrawer
         open={drawerOpen}
         handleDrawerClose={handleDrawerClose}
